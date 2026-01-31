@@ -1,0 +1,33 @@
+# Environment files
+.env*
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.cursor/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Development containers
+.devcontainer
