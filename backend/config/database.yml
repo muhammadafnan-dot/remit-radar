@@ -83,10 +83,9 @@ test:
 #
 production:
   primary: &primary_production
-    <<: *default
-    database: remit_radar_production
-    username: remit_radar
-    password: <%= ENV["REMIT_RADAR_DATABASE_PASSWORD"] %>
+    url: <%= ENV.fetch("DATABASE_URL") { "postgresql://localhost/remit_radar_production" } %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    encoding: unicode
   cache:
     <<: *primary_production
     database: remit_radar_production_cache

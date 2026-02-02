@@ -10,18 +10,22 @@ resource "aws_lb" "main" {
 }
 
 resource "aws_lb_target_group" "backend" {
-  name        = "${var.project_name}-tg"
-  port        = 80
+  name        = "${var.project_name}-tg-3000"
+  port        = 3000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"  # Required for Fargate
 
   health_check {
-    path                = "/api/v1/health"  
+    path                = "/up"
     healthy_threshold   = 2
     unhealthy_threshold = 3
     timeout             = 5
     interval            = 30
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

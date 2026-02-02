@@ -6,7 +6,7 @@ variable "aws_profile" {
     type = string
     default = "remit-radar"
 }
-varibale "project_name" {
+variable "project_name" {
     type = string
     default = "remit-radar"
 }
@@ -14,7 +14,7 @@ variable "environment" {
     type = string
     default = "dev"
 }
-vaiable "db_username" {
+variable "db_username" {
     type = string
     default = "remit-radar"
 }

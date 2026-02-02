@@ -21,13 +21,16 @@ resource "aws_ecs_task_definition" "backend" {
     image = "${aws_ecr_repository.backend.repository_url}:latest"
 
     portMappings = [{
-      containerPort = 80
+      containerPort = 3000
       protocol      = "tcp"
     }]
 
     environment = [
       { name = "RAILS_ENV", value = "production" },
       { name = "RAILS_LOG_TO_STDOUT", value = "true" },
+      { name = "HTTP_PORT", value = "3000" },
+      { name = "TARGET_PORT", value = "3001" },
+      { name = "PORT", value = "3001" },
       { name = "DATABASE_URL", value = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.postgres.endpoint}/remit_radar_production" },
       { name = "RAILS_MASTER_KEY", value = var.rails_master_key },
     ]
@@ -51,20 +54,27 @@ resource "aws_ecs_service" "backend" {
   launch_type     = "FARGATE"
 
   network_configuration {
+    # COST OPTIMIZATION: Using public subnets to avoid NAT Gateway cost (~$32/month)
+    # Security is maintained via security groups (only ALB can access)
+    # For production, consider using private subnets with NAT Gateway
     subnets = [
-      aws_subnet.private_a.id,
-      aws_subnet.private_b.id,
+      aws_subnet.public_a.id,
+      aws_subnet.public_b.id,
     ]
     security_groups = [aws_security_group.ecs.id]
+    assign_public_ip = true  # Required for public subnets
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.backend.arn
     container_name   = "backend"
-    container_port   = 80
+    container_port   = 3000
   }
 
   # Allow ECS to drain old tasks during deployment
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
+
+  # Enable ECS Exec for running migrations/seeds
+  enable_execute_command = true
 }
